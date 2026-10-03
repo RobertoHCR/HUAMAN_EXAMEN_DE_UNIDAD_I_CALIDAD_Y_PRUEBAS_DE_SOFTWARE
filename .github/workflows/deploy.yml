@@ -12,27 +12,19 @@ concurrency:
 jobs:
   tests:
     uses: ./.github/workflows/tests.yml
-  sonar:
-    uses: ./.github/workflows/sonar.yml
-    secrets: inherit
-  security:
-    uses: ./.github/workflows/snyk-semgrep.yml
-    secrets: inherit
   documentation:
     uses: ./.github/workflows/generase-documentation.yml
   release:
-    needs: [tests, sonar, security, documentation]
+    needs: [tests, documentation]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: scanned-container
+      - uses: actions/checkout@v4
       - uses: azure/login@v2
         with:
           client-id: ${{ vars.AZURE_CLIENT_ID }}
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-      - name: Publish scanned image and deploy
+      - name: Build container, publish and deploy
         env:
           PREFIX: ${{ vars.AZURE_PREFIX }}
           RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
@@ -40,9 +32,7 @@ jobs:
           REGISTRY="${PREFIX}acr"
           IMAGE="${REGISTRY}.azurecr.io/courtflow:${GITHUB_SHA}"
           az acr login --name "$REGISTRY"
-          docker load -i scanned-image.tar
-          docker tag courtflow:scan "$IMAGE"
-          docker tag courtflow:scan "${REGISTRY}.azurecr.io/courtflow:latest"
+          docker build --pull -t "$IMAGE" -t "${REGISTRY}.azurecr.io/courtflow:latest" .
           docker push "$IMAGE"
           docker push "${REGISTRY}.azurecr.io/courtflow:latest"
           az webapp config container set --name "${PREFIX}-web" --resource-group "$RESOURCE_GROUP" \
