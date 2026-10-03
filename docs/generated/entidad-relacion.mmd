@@ -1,0 +1,38 @@
+erDiagram
+  courts {
+    integer id PK
+    text name
+    text venue
+    text sport
+    integer capacity
+    integer hourly_rate
+  }
+  rentals {
+    integer id PK
+    integer court_id FK
+    integer user_id FK
+    text date
+    integer starts
+    integer ends
+    text event
+    text status
+    text payment
+    integer total
+    text created_at
+  }
+  schedules {
+    integer id PK
+    integer court_id FK
+    integer weekday
+    integer opens
+    integer closes
+  }
+  users {
+    integer id PK
+    text name
+    text email
+    text access_hash
+  }
+  courts ||--o{ schedules : dispone
+  courts ||--o{ rentals : recibe
+  users ||--o{ rentals : solicita

@@ -1,0 +1,35 @@
+classDiagram
+  class InputModel {
+  }
+  class CourtInput {
+    +str name
+    +str venue
+    +string sport
+    +int capacity
+    +int hourly_rate
+  }
+  InputModel <|-- CourtInput
+  class UserInput {
+    +str name
+    +str email
+  }
+  InputModel <|-- UserInput
+  class ScheduleInput {
+    +int weekday
+    +str opens
+    +str closes
+  }
+  InputModel <|-- ScheduleInput
+  class RentalInput {
+    +int court_id
+    +int user_id
+    +date date
+    +str time
+    +int duration
+    +str event
+  }
+  InputModel <|-- RentalInput
+  class ConfirmationInput {
+    +string payment
+  }
+  InputModel <|-- ConfirmationInput

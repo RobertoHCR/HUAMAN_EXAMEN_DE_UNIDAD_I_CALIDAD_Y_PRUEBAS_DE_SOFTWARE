@@ -1,0 +1,18 @@
+rules:
+  - id: no-python-eval
+    languages: [python]
+    severity: ERROR
+    message: No ejecutar código Python recibido como texto.
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: exec(...)
+  - id: no-shell-true
+    languages: [python]
+    severity: ERROR
+    message: Ejecuta subprocesos sin shell y con argumentos separados.
+    pattern: subprocess.$METHOD(..., shell=True, ...)
+  - id: no-unsafe-innerhtml
+    languages: [javascript]
+    severity: ERROR
+    message: Usar textContent y nodos DOM para contenido del usuario.
+    pattern: $EL.innerHTML = $VALUE

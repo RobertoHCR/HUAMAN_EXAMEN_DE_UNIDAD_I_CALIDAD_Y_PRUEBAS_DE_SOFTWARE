@@ -1,0 +1,10 @@
+flowchart TD
+  UI["Frontend HTML / CSS / JavaScript"]
+  API["API REST FastAPI"]
+  AUTH["Validación y controles de acceso"]
+  DB["Repositorio SQLite"]
+  SQL["Esquema relacional"]
+  UI --> API
+  API --> AUTH
+  API --> DB
+  DB --> SQL

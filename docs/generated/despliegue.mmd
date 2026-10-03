@@ -1,0 +1,15 @@
+flowchart TD
+  U["Navegador"]
+  GH["GitHub Actions"]
+  Q["Pruebas, Sonar, Snyk y Semgrep"]
+  ACR["Azure Container Registry"]
+  WEB["Azure App Service Linux: 1 instancia"]
+  HOME["SQLite en /home/data persistente"]
+  STATE["Azure Storage: estado Terraform"]
+  U -->|HTTPS| WEB
+  GH --> Q
+  Q -->|Imagen aprobada| ACR
+  ACR -->|Identidad administrada| WEB
+  WEB --> HOME
+  GH -->|Terraform| STATE
+  GH -->|Provisiona y despliega| WEB

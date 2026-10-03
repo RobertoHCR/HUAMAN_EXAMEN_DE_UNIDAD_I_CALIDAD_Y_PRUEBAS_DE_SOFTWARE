@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>CourtFlow | Reserva tu loza</title>
+  <meta name="description" content="Consulta lozas deportivas y reserva una franja para tu próximo partido.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css"><script src="/app.js" defer></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="/"><span class="brand-symbol">C</span>CourtFlow<span class="brand-dot">.</span></a>
+    <p class="nav-label">TU PRÓXIMO PARTIDO</p>
+    <nav aria-label="Navegación principal">
+      <button class="nav active" data-view="reserve"><span>◫</span> Reservar loza</button>
+      <button class="nav" data-view="history"><span>▤</span> Mis reservas</button>
+      <button class="nav" data-view="admin"><span>⚙</span> Administración</button>
+    </nav>
+    <div class="sidebar-bottom"><span class="mini-court">CF</span><div><strong>Elige. Reserva. Juega.</strong><small>Horarios en hora de Perú</small></div></div>
+  </aside>
+  <main>
+    <header class="topbar"><span>Lozas deportivas / <strong id="breadcrumb">Reservar</strong></span><span class="top-pill">Hora de Perú · UTC−5</span></header>
+    <section id="reserve-view" class="view">
+      <div class="page-heading"><div><p class="eyebrow">HAZ ESPACIO PARA EL DEPORTE</p><h1>Tu cancha, tu momento<span>.</span></h1><p>Encuentra una loza disponible para tu próximo encuentro.</p></div><div class="heading-mark">01<span>/ JUEGA</span></div></div>
+      <form id="search-form" class="search-panel">
+        <label>Deporte<select id="sport"><option value="">Todos los deportes</option><option>Fútbol</option><option>Vóley</option><option>Básquet</option></select></label>
+        <label>Fecha<input id="date" type="date" required></label>
+        <label>Hora<input id="time" type="time" step="1800" value="18:00" required></label>
+        <label>Duración<select id="duration"><option value="30">30 minutos</option><option value="60" selected>1 hora</option><option value="90">1 h 30 min</option><option value="120">2 horas</option><option value="180">3 horas</option><option value="240">4 horas</option></select></label>
+        <button class="primary" type="submit">Buscar disponibilidad</button>
+      </form>
+      <div class="results-heading"><div><h2>Encuentra tu loza</h2><p id="result-summary" aria-live="polite">Consultando disponibilidad…</p></div><label class="venue-filter">Sede<select id="venue"><option value="">Todas las sedes</option></select></label></div>
+      <div id="courts" class="court-grid"></div>
+      <div class="info-strip"><span class="info-icon">i</span><p>La solicitud guarda tu franja horaria. La sede confirma el alquiler y registra el pago.</p><strong>Sin cruces de horarios</strong></div>
+    </section>
+    <section id="history-view" class="view" hidden>
+      <div class="page-heading"><div><p class="eyebrow">TUS ENCUENTROS</p><h1>Mis reservas<span>.</span></h1><p>Consulta la confirmación y el estado de pago.</p></div></div>
+      <p class="subtle">El acceso a tus reservas se conserva en este navegador. Guarda tu sesión y evita borrar sus datos.</p>
+      <div id="history" class="records"></div>
+    </section>
+    <section id="admin-view" class="view" hidden>
+      <div class="page-heading"><div><p class="eyebrow">GESTIÓN DE LA SEDE</p><h1>Administración<span>.</span></h1><p>Gestiona las lozas, los horarios y las solicitudes.</p></div></div>
+      <form id="admin-login" class="panel admin-login"><h2>Acceso de administración</h2><label>Clave de administración<input id="admin-key" type="password" minlength="32" required autocomplete="off"></label><button class="primary">Ingresar</button></form>
+      <div id="admin-content" hidden>
+        <div class="admin-toolbar"><h2>Solicitudes de alquiler</h2><label>Loza<select id="admin-filter"><option value="">Todas las lozas</option></select></label><button class="secondary" id="admin-refresh">Actualizar</button><button class="secondary" id="admin-logout">Cerrar sesión</button></div>
+        <div id="admin-rentals" class="records"></div>
+        <div class="admin-grid">
+          <form id="court-form" class="panel"><h2>Registrar loza</h2><label>Nombre<input name="name" minlength="3" maxlength="70" required></label><label>Sede<input name="venue" minlength="3" maxlength="70" required></label><div class="form-row"><label>Deporte<select name="sport"><option>Fútbol</option><option>Vóley</option><option>Básquet</option></select></label><label>Capacidad<input name="capacity" type="number" min="2" max="100" value="12" required></label></div><label>Precio por hora (S/)<input name="rate" type="number" min="1" max="1000" step="0.01" value="50" required></label><button class="primary">Registrar loza</button></form>
+          <form id="schedule-form" class="panel"><h2>Configurar disponibilidad</h2><label>Loza<select name="court_id" id="schedule-court" required></select></label><label>Día de la semana<select name="weekday"><option value="0">Lunes</option><option value="1">Martes</option><option value="2">Miércoles</option><option value="3">Jueves</option><option value="4">Viernes</option><option value="5">Sábado</option><option value="6">Domingo</option></select></label><div class="form-row"><label>Apertura<input name="opens" type="time" value="08:00" required></label><label>Cierre<input name="closes" type="time" value="23:00" required></label></div><p class="subtle">Cada día tiene una franja continua. No se permiten cambios que afecten reservas existentes.</p><button class="primary">Guardar horario</button></form>
+        </div>
+      </div>
+    </section>
+    <footer>CourtFlow <span>Un lugar para cada encuentro.</span></footer>
+  </main>
+  <dialog id="booking-dialog">
+    <form id="booking-form"><div class="dialog-top"><p class="eyebrow">SOLICITUD DE RESERVA</p><button type="button" class="close" aria-label="Cerrar">×</button></div><h2 id="booking-title">Reservar loza</h2><div id="booking-summary" class="booking-summary"></div><label>Tu nombre<input id="user-name" minlength="2" maxlength="80" required autocomplete="name"></label><label>Correo electrónico<input id="user-email" type="email" maxlength="120" required autocomplete="email"></label><label>Nombre del evento<input id="event" minlength="3" maxlength="120" placeholder="Partido con amigos" required></label><p class="subtle">El pago se coordina con la sede. Esta solicitud queda pendiente de confirmación.</p><button class="primary full" id="booking-submit">Solicitar reserva</button></form>
+  </dialog>
+  <div id="toast" class="toast" role="status" hidden></div>
+</body></html>

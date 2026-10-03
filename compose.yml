@@ -1,0 +1,13 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      ADMIN_TOKEN: ${ADMIN_TOKEN:?Configura ADMIN_TOKEN en .env}
+      DATABASE_PATH: /home/data/courtflow.db
+    volumes:
+      - courtflow-data:/home/data
+    restart: unless-stopped
+volumes:
+  courtflow-data:
