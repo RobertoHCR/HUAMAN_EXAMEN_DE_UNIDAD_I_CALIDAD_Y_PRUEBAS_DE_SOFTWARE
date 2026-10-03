@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.env
+data/
+*.db
+*.db-journal
+*.tfstate*
+.terraform/
+*.tfplan
+infra/*.tfvars
+reports/
+.scannerwork/
+bootstrap-values.txt

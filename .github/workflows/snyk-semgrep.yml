@@ -1,0 +1,55 @@
+name: snyk-semgrep
+on:
+  workflow_dispatch:
+  workflow_call:
+permissions:
+  contents: read
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: pip install -r requirements.txt pip-audit
+      - name: Install Semgrep in an isolated environment
+        run: |
+          python -m venv /tmp/semgrep-tools
+          /tmp/semgrep-tools/bin/pip install semgrep==1.179.0 opentelemetry-instrumentation-requests==0.58b0 opentelemetry-instrumentation-threading==0.58b0
+          chmod +x /tmp/semgrep-tools/lib/python3.12/site-packages/semgrep/bin/semgrep-core
+      - run: npm install -g snyk
+      - run: mkdir -p reports
+      - name: Semgrep source scan
+        run: /tmp/semgrep-tools/bin/semgrep scan --config p/security-audit --config semgrep.yml --error --json --output reports/semgrep.json app scripts
+      - name: Python dependency audit
+        if: ${{ !cancelled() }}
+        run: pip-audit -r requirements.txt -f json -o reports/pip-audit.json
+      - name: Snyk dependency scan - all severities
+        if: ${{ !cancelled() }}
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: snyk test --file=requirements.txt --package-manager=pip --json-file-output=reports/snyk-dependencies.json
+      - name: Build backend container
+        if: ${{ !cancelled() }}
+        run: docker build --pull -t courtflow:scan .
+      - name: Snyk container scan - all severities
+        if: ${{ !cancelled() }}
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: snyk container test courtflow:scan --file=Dockerfile --json-file-output=reports/snyk-container.json
+      - name: Store the exact scanned image
+        run: docker save courtflow:scan -o scanned-image.tar
+      - uses: actions/upload-artifact@v4
+        with:
+          name: scanned-container
+          path: scanned-image.tar
+          retention-days: 1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-reports
+          path: reports/
